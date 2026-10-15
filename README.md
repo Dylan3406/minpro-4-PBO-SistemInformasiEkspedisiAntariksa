@@ -232,20 +232,24 @@ Tampilan di atas menunjukkan menu rekapitulasi atau `ringkasan` keseluruhan data
 Tampilan di atas merupakan menu utama dari `Sistem Pengelolaan Ekspedisi Antariksa` beserta proses penutupan program. <br>
 
 ### Dokumentasi Database, JDBC, dan ORM
+<img width="1007" height="163" alt="image" src="https://github.com/user-attachments/assets/701952ed-6996-412f-90a9-9c582ee0b6ff" /> 
+<img width="712" height="98" alt="image" src="https://github.com/user-attachments/assets/bf988fc3-b27e-40e3-a280-7131619a5191" /> 
+<img width="987" height="101" alt="image" src="https://github.com/user-attachments/assets/dbe0e2d7-be8b-4fc5-986d-eedb3902bbad" />
+<img width="623" height="95" alt="image" src="https://github.com/user-attachments/assets/cd65063e-626e-4d01-9a2a-9a65c2bc58b5" /> <br>
 
-> Ganti `GANTI_DENGAN_LINK_GAMBAR` pada setiap gambar di bawah dengan link screenshot milikmu.
-
-<img width="500" alt="phpMyAdmin" src="GANTI_DENGAN_LINK_GAMBAR" /> <br>
 Tampilan tabel `ekspedisi`, `kru`, dan `pesawat_antariksa` di phpMyAdmin beserta data awal hasil import file `.sql`. <br>
 
-<img width="500" alt="Tes Koneksi" src="GANTI_DENGAN_LINK_GAMBAR" /> <br>
+<img width="885" height="388" alt="image" src="https://github.com/user-attachments/assets/49d39489-ad6c-4293-9797-b9d8c871e30d" /> <br>
 Hasil uji koneksi: pesan `Koneksi Berhasil` menandakan program sudah terhubung ke database `ekspedisi_antariksa` lewat JDBC. <br>
 
 <img width="500" alt="Tampilkan data dengan ORM" src="GANTI_DENGAN_LINK_GAMBAR" /> <br>
 Menu "Tampilkan Data" langsung berisi data tanpa input manual, karena data dibaca dari database. Baris berawalan `Hibernate: select ...` di atasnya adalah SQL yang dibuat otomatis oleh ORM (Hibernate). <br>
 
-<img width="500" alt="Isi tabel setelah CRUD" src="GANTI_DENGAN_LINK_GAMBAR" /> <br>
+<img width="911" height="257" alt="image" src="https://github.com/user-attachments/assets/bae11e47-7fa4-463f-bb23-17baa656167e" /> <br>
 Isi tabel di phpMyAdmin setelah proses tambah, ubah, dan hapus, membuktikan perubahan benar-benar tersimpan di database. <br>
 
-<img width="500" alt="Data permanen" src="GANTI_DENGAN_LINK_GAMBAR" /> <br>
+<img width="941" height="304" alt="image" src="https://github.com/user-attachments/assets/6cd13d2d-5fba-4cb2-af9f-3ae42ba97b3b" /> <br>
+<img width="919" height="367" alt="image" src="https://github.com/user-attachments/assets/b011d399-6ab8-4cf9-be42-ca1ebbbe4d49" /> <br>
+<img width="733" height="141" alt="image" src="https://github.com/user-attachments/assets/c402776d-ec95-4484-9d56-a838b5678e6b" /> <br>
+
 Data yang ditambahkan tetap ada setelah program ditutup dan dijalankan ulang, membuktikan data tersimpan permanen di database. <br>
