@@ -79,17 +79,8 @@ Driver yang dipakai adalah `mysql-connector-j`, ditambahkan sebagai dependency d
 
 Setiap entitas punya satu class DAO (`EkspedisiDAOCC`, `KruDAOCC`, `PesawatDAOCC`) yang berisi operasi CRUD. Semua query memakai **`PreparedStatement`**: nilai dimasukkan lewat tanda tanya (`?`), bukan digabung langsung ke teks SQL.
 
-```java
-String sql = "INSERT INTO ekspedisi (id_ekspedisi, nama, tujuan, durasi, status) VALUES (?, ?, ?, ?, ?)";
-try (PreparedStatement ps = Koneksi.getConnection().prepareStatement(sql)) {
-    ps.setInt(1, e.getIdEkspedisi());
-    ps.setString(2, e.getNamaEkspedisi());
-    ps.setString(3, e.getTujuan());
-    ps.setInt(4, e.getDurasi());
-    ps.setString(5, e.getStatus());
-    return ps.executeUpdate() > 0;
-}
-```
+<img width="881" height="183" alt="image" src="https://github.com/user-attachments/assets/39d3afdc-bf6f-473d-add2-e24e6580ff18" />
+
 
 Manfaat `PreparedStatement`:
 - Mencegah **SQL injection**, karena input pengguna diperlakukan sebagai nilai, bukan bagian dari perintah SQL.
@@ -110,19 +101,9 @@ Method yang tersedia di setiap DAO:
 
 Pada `KruDAOCC`, hierarki pewarisan dipetakan ke satu tabel `kru` dengan kolom `tipe` (`Astronot` atau `Teknisi`). Saat menyimpan, `instanceof` menentukan kolom khusus mana yang diisi. Saat membaca, kolom `tipe` menentukan objek yang dibuat: `Astronot` atau `Teknisi`.
 
-## Database dan Data Awal dari File `.sql`
+## Database 
 
 File `database/ekspedisi_antariksa.sql` berisi perintah untuk membuat database, tiga tabel (`ekspedisi`, `kru`, `pesawat_antariksa`), dan mengisi data awal dengan `INSERT`. Data awal **tidak** ditulis di dalam kode Java, sehingga menu "Tampilkan Data" langsung berisi data begitu program dijalankan.
-
-Cara memakai file `.sql`:
-1. Jalankan MySQL (XAMPP atau Laragon).
-2. Import file lewat phpMyAdmin (tab **Import**), atau lewat terminal:
-   ```
-   mysql -u root -p < database/ekspedisi_antariksa.sql
-   ```
-3. Pastikan database `ekspedisi_antariksa` beserta tiga tabelnya muncul.
-
-File `.sql` memuat `DROP TABLE IF EXISTS`, sehingga aman di-import ulang untuk mengembalikan data ke kondisi awal.
 
 ## Nilai Tambah: ORM (Hibernate)
 
@@ -132,33 +113,15 @@ File `.sql` memuat `DROP TABLE IF EXISTS`, sehingga aman di-import ulang untuk m
 
 Class model diberi anotasi JPA sehingga menjadi *entity*:
 
-```java
-@Entity
-@Table(name = "ekspedisi")
-public class Ekspedisi implements EntitasAntariksa {
-    @Id
-    @Column(name = "id_ekspedisi")
-    private int idEkspedisi;
+<img width="433" height="168" alt="image" src="https://github.com/user-attachments/assets/c97f64d9-a43a-4c9b-b069-03cff2f74589" />
 
-    @Column(name = "nama")
-    private String namaEkspedisi;
-    ...
-}
-```
 
 Hierarki `Kru`, `Astronot`, dan `Teknisi` dipetakan dengan strategi **single table**: satu tabel `kru`, dibedakan oleh kolom `tipe`.
 
-```java
-@Entity
-@Table(name = "kru")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "tipe", discriminatorType = DiscriminatorType.STRING)
-public abstract class Kru implements EntitasAntariksa { ... }
+<img width="662" height="133" alt="image" src="https://github.com/user-attachments/assets/9e7767ba-886c-4fbb-a969-960d49262ead" /> <br>
 
-@Entity
-@DiscriminatorValue("Astronot")
-public class Astronot extends Kru { ... }
-```
+<img width="300" height="61" alt="image" src="https://github.com/user-attachments/assets/1c71bc70-84ee-488f-bccc-bc14b9638abb" /> <br>
+
 
 Karena itu, saat data kru dibaca, Hibernate langsung membuat objek `Astronot` atau `Teknisi` sesuai nilai kolom `tipe`, tanpa `instanceof` maupun `setNull` manual seperti pada JDBC.
 
