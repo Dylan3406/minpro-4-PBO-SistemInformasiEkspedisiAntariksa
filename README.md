@@ -1,8 +1,4 @@
 # Minpro 4 PBO Sistem Informasi Ekspedisi Antariksa
-
-Mini Project 4 - Praktikum Pemrograman Berorientasi Objek.
-Program ini melanjutkan Mini Project 3 (Sistem Pengelolaan Ekspedisi Antariksa) dengan tetap mempertahankan struktur MVC, encapsulation, inheritance, polymorphism, dan interface, serta menambahkan **koneksi database MySQL** (JDBC `PreparedStatement` dan DAO), **data awal dari file `.sql`**, dan **ORM (Hibernate)** sebagai nilai tambah.
-
 ## Deskripsi Singkat Program
 
 Program ini adalah aplikasi konsol (CLI) berbasis Java untuk mengelola data operasional sebuah lembaga eksplorasi antariksa, yang terdiri dari tiga entitas utama:
@@ -13,51 +9,7 @@ Program ini adalah aplikasi konsol (CLI) berbasis Java untuk mengelola data oper
 
 Setiap entitas mendukung operasi CRUD penuh (Tambah, Tampilkan, Ubah, Hapus), ditambah fitur **Ringkasan Semua Data** yang menampilkan Ekspedisi, Kru, dan Pesawat sekaligus dalam satu daftar gabungan. Pada Mini Project 4, seluruh data disimpan di database MySQL sehingga tidak hilang saat program ditutup.
 
-## Teknologi yang Digunakan
-
-| Komponen | Keterangan |
-|---|---|
-| Bahasa | Java (Maven, NetBeans) |
-| Database | MySQL |
-| Koneksi | JDBC dengan `mysql-connector-j` dan `PreparedStatement` |
-| Pola akses data | DAO (*Data Access Object*) |
-| ORM (nilai tambah) | Hibernate (`hibernate-core`) dengan anotasi JPA |
-
 ## Struktur Package (MVC + DAO)
-
-```
-src/main/java/
-├── main/
-│   └── Main.java
-├── config/
-│   ├── Koneksi.java
-│   ├── HibernateUtil.java
-│   └── TesKoneksi.java
-├── dao/
-│   ├── EkspedisiDAOCC.java
-│   ├── KruDAOCC.java
-│   ├── PesawatDAOCC.java
-│   ├── EkspedisiDAOORM.java
-│   ├── KruDAOORM.java
-│   └── PesawatDAOORM.java
-├── model/
-│   ├── EntitasAntariksa.java
-│   ├── Ekspedisi.java
-│   ├── Kru.java
-│   ├── Astronot.java
-│   ├── Teknisi.java
-│   └── PesawatAntariksa.java
-├── view/
-│   └── View.java
-└── controller/
-    ├── EkspedisiController.java
-    ├── KruController.java
-    ├── PesawatController.java
-    └── Ringkasan.java
-database/
-└── ekspedisi_antariksa.sql
-```
-
 - **Model** hanya berisi atribut (`private`), constructor, getter/setter, dan method tampilan data miliknya sendiri. Tidak ada logika menu, `Scanner`, maupun SQL di sini. Pada Mini Project 4, class model juga diberi anotasi JPA agar bisa dipetakan ke tabel oleh Hibernate.
 - **View** hanya berisi method untuk mencetak teks ke layar dan membaca serta memvalidasi input dari `Scanner`. View tidak menyimpan data aplikasi apa pun.
 - **Controller** berisi seluruh logika CRUD dan validasi (misalnya cek ID duplikat). Controller tidak lagi menyimpan data di `ArrayList`, melainkan memanggil **DAO** untuk mengakses database, memanggil `View` untuk berinteraksi dengan pengguna, dan `Model` untuk membuat atau mengubah objek data.
@@ -119,11 +71,7 @@ Manfaat nyatanya: `Ringkasan` tidak perlu tahu atau peduli apakah suatu data itu
 
 Class `config/Koneksi.java` menyimpan alamat database, username, dan password, lalu menyediakan method `getConnection()` yang mengembalikan objek `Connection`. Jika koneksi belum ada atau sudah tertutup, koneksi baru dibuat.
 
-```java
-private static final String URL = "jdbc:mysql://localhost:3306/ekspedisi_antariksa";
-private static final String USER = "root";
-private static final String PASS = "";
-```
+<img width="685" height="63" alt="image" src="https://github.com/user-attachments/assets/49a598f1-a2f3-4194-867f-fc341a336000" />
 
 Driver yang dipakai adalah `mysql-connector-j`, ditambahkan sebagai dependency di `pom.xml`. Class `TesKoneksi` dipakai untuk menguji bahwa program berhasil terhubung ke database.
 
