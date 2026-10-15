@@ -140,14 +140,12 @@ Hibernate tidak dibiarkan mengubah struktur tabel (`hbm2ddl` tidak diaktifkan), 
 
 ### Perbandingan JDBC dan ORM
 
-| | DAO JDBC (`DAOCC`) | DAO ORM (`DAOORM`) |
-|---|---|---|
-| SQL | Ditulis manual | Dibuat otomatis oleh Hibernate |
-| Mengubah data tabel menjadi objek | Manual (`ResultSet` dan `mapRow`) | Otomatis lewat anotasi |
-| Astronot dan Teknisi | `instanceof` dan `setNull` | `@DiscriminatorValue` |
-| Jumlah kode | Lebih panjang | Lebih ringkas |
+SQL: pada DAO JDBC (DAOCC) query ditulis manual, sedangkan pada DAO ORM (DAOORM) query dibuat otomatis oleh Hibernate.
+Mengubah data tabel menjadi objek: pada JDBC dilakukan manual lewat ResultSet dan mapRow, sedangkan pada ORM dilakukan otomatis lewat anotasi.
+Astronot dan Teknisi: pada JDBC dibedakan dengan instanceof dan setNull, sedangkan pada ORM cukup memakai @DiscriminatorValue.
+Jumlah kode: DAO JDBC lebih panjang, DAO ORM lebih ringkas.
 
-Kedua jenis DAO tetap disimpan di package `dao`. Controller memakai DAO ORM; untuk kembali ke JDBC cukup mengganti import dan satu baris deklarasi field di Controller. Konfigurasi `hibernate.show_sql` diaktifkan agar SQL hasil buatan Hibernate tampil di konsol (baris berawalan `Hibernate:`) sebagai bukti ORM berjalan.
+Kedua jenis DAO tetap disimpan di package dao. Controller memakai DAO ORM; untuk kembali ke JDBC cukup mengganti import dan satu baris deklarasi field di Controller. Konfigurasi hibernate.show_sql diaktifkan agar SQL hasil buatan Hibernate tampil di konsol (baris berawalan Hibernate:) sebagai bukti ORM berjalan.
 
 ## Validasi Input yang Diterapkan
 
