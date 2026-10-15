@@ -248,13 +248,9 @@ Data inilah yang langsung tampil saat menu "Tampilkan Data" dijalankan, membukti
 Hasil uji koneksi: pesan `Koneksi Berhasil` menandakan program sudah terhubung ke database `ekspedisi_antariksa` lewat JDBC. <br>
 
 <img width="1181" height="260" alt="image" src="https://github.com/user-attachments/assets/e3d3e370-c50c-467c-8b63-6e415fd3dc02" /> <br>
-Menu "Tampilkan Data" langsung berisi data tanpa input manual, karena data dibaca dari database. Baris berawalan `Hibernate: select ...` di atasnya adalah SQL yang dibuat otomatis oleh ORM (Hibernate). <br>
-
-<img width="911" height="257" alt="image" src="https://github.com/user-attachments/assets/bae11e47-7fa4-463f-bb23-17baa656167e" /> <br>
-Isi tabel di phpMyAdmin setelah proses tambah, ubah, dan hapus, membuktikan perubahan benar-benar tersimpan di database. <br>
-
+Menu "Tampilkan Data" langsung berisi data tanpa input manual, karena data dibaca dari database. Baris berawalan `Hibernate: select ...` di atasnya adalah SQL yang dibuat otomatis oleh ORM (Hibernate).<br>
 <img width="941" height="304" alt="image" src="https://github.com/user-attachments/assets/6cd13d2d-5fba-4cb2-af9f-3ae42ba97b3b" /> <br>
 <img width="919" height="367" alt="image" src="https://github.com/user-attachments/assets/b011d399-6ab8-4cf9-be42-ca1ebbbe4d49" /> <br>
 <img width="733" height="141" alt="image" src="https://github.com/user-attachments/assets/c402776d-ec95-4484-9d56-a838b5678e6b" /> <br>
-
+Isi tabel di phpMyAdmin setelah proses tambah, membuktikan perubahan benar-benar tersimpan di database. <br>
 Data yang ditambahkan tetap ada setelah program ditutup dan dijalankan ulang, membuktikan data tersimpan permanen di database. <br>
