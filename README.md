@@ -1,39 +1,90 @@
 # Minpro 4 PBO Sistem Informasi Ekspedisi Antariksa
+
+Mini Project 4 - Praktikum Pemrograman Berorientasi Objek.
+Program ini melanjutkan Mini Project 3 (Sistem Pengelolaan Ekspedisi Antariksa) dengan tetap mempertahankan struktur MVC, encapsulation, inheritance, polymorphism, dan interface, serta menambahkan **koneksi database MySQL** (JDBC `PreparedStatement` dan DAO), **data awal dari file `.sql`**, dan **ORM (Hibernate)** sebagai nilai tambah.
+
 ## Deskripsi Singkat Program
+
 Program ini adalah aplikasi konsol (CLI) berbasis Java untuk mengelola data operasional sebuah lembaga eksplorasi antariksa, yang terdiri dari tiga entitas utama:
 
 - **Ekspedisi** - misi eksplorasi antariksa (nama, tujuan, durasi, status).
 - **Kru** - anggota kru ekspedisi, terbagi menjadi dua peran: **Astronot** dan **Teknisi**.
 - **Pesawat Antariksa** - armada pesawat yang digunakan untuk ekspedisi (nama, jenis, kapasitas, status).
 
-Setiap entitas mendukung operasi CRUD penuh (Tambah, Tampilkan, Ubah, Hapus), ditambah satu fitur baru di Mini Project 3: **Ringkasan Semua Data**, yang menampilkan Ekspedisi, Kru, dan Pesawat sekaligus dalam satu daftar gabungan.
+Setiap entitas mendukung operasi CRUD penuh (Tambah, Tampilkan, Ubah, Hapus), ditambah fitur **Ringkasan Semua Data** yang menampilkan Ekspedisi, Kru, dan Pesawat sekaligus dalam satu daftar gabungan. Pada Mini Project 4, seluruh data disimpan di database MySQL sehingga tidak hilang saat program ditutup.
 
-## Struktur Package (MVC)
-- **Model** hanya berisi atribut (private), constructor, getter/setter, dan method tampilan data milik dirinya sendiri. Tidak ada logika menu atau `Scanner` di sini.
-- **View** hanya berisi method untuk mencetak teks ke layar dan membaca+memvalidasi input dari `Scanner`. View tidak menyimpan data aplikasi.
-- **Controller** menyimpan `ArrayList` data, berisi seluruh logika CRUD dan validasi (misalnya cek ID duplikat), lalu memanggil `View` untuk berinteraksi dengan pengguna dan `Model` untuk membuat/mengubah objek data.
+## Teknologi yang Digunakan
+
+| Komponen | Keterangan |
+|---|---|
+| Bahasa | Java (Maven, NetBeans) |
+| Database | MySQL |
+| Koneksi | JDBC dengan `mysql-connector-j` dan `PreparedStatement` |
+| Pola akses data | DAO (*Data Access Object*) |
+| ORM (nilai tambah) | Hibernate (`hibernate-core`) dengan anotasi JPA |
+
+## Struktur Package (MVC + DAO)
+
+```
+src/main/java/
+├── main/
+│   └── Main.java
+├── config/
+│   ├── Koneksi.java
+│   ├── HibernateUtil.java
+│   └── TesKoneksi.java
+├── dao/
+│   ├── EkspedisiDAOCC.java
+│   ├── KruDAOCC.java
+│   ├── PesawatDAOCC.java
+│   ├── EkspedisiDAOORM.java
+│   ├── KruDAOORM.java
+│   └── PesawatDAOORM.java
+├── model/
+│   ├── EntitasAntariksa.java
+│   ├── Ekspedisi.java
+│   ├── Kru.java
+│   ├── Astronot.java
+│   ├── Teknisi.java
+│   └── PesawatAntariksa.java
+├── view/
+│   └── View.java
+└── controller/
+    ├── EkspedisiController.java
+    ├── KruController.java
+    ├── PesawatController.java
+    └── Ringkasan.java
+database/
+└── ekspedisi_antariksa.sql
+```
+
+- **Model** hanya berisi atribut (`private`), constructor, getter/setter, dan method tampilan data miliknya sendiri. Tidak ada logika menu, `Scanner`, maupun SQL di sini. Pada Mini Project 4, class model juga diberi anotasi JPA agar bisa dipetakan ke tabel oleh Hibernate.
+- **View** hanya berisi method untuk mencetak teks ke layar dan membaca serta memvalidasi input dari `Scanner`. View tidak menyimpan data aplikasi apa pun.
+- **Controller** berisi seluruh logika CRUD dan validasi (misalnya cek ID duplikat). Controller tidak lagi menyimpan data di `ArrayList`, melainkan memanggil **DAO** untuk mengakses database, memanggil `View` untuk berinteraksi dengan pengguna, dan `Model` untuk membuat atau mengubah objek data.
+- **DAO** berisi class yang khusus mengurus akses data ke database (query SQL atau operasi Hibernate). Controller hanya memanggil method DAO.
+- **Config** berisi pengaturan koneksi ke database: `Koneksi` untuk JDBC dan `HibernateUtil` untuk ORM.
 - **Main** hanya menampilkan struktur menu dan meneruskan pilihan pengguna ke method Controller yang sesuai.
-- 
+
 ## Penjelasan Alur Program
 
 1. Program dimulai dari `Main.java`, menampilkan menu utama dengan 4 modul (Ekspedisi, Kru, Pesawat, Ringkasan) dan 1 pilihan keluar.
-2. Saat program dijalankan, `EkspedisiController`, `KruController`, dan `PesawatController` masing-masing langsung mengisi **dummy data awal** ke `ArrayList`-nya, sehingga menu "Tampilkan Data" langsung berisi data tanpa harus input manual dulu.
-3. Setiap modul punya sub-menu (Tambah, Tampilkan, Ubah, Hapus, Kembali) yang memanggil method pada Controller terkait.
-4. Menu baru **"Ringkasan Semua Data"** memanggil `RingkasanController`, yang mengambil data dari ketiga controller lain lewat method `getSemuaEntitas()`, menggabungkannya menjadi satu `List<EntitasAntariksa>`, lalu menampilkan identitas singkat setiap data secara seragam -- walau tipe aslinya berbeda-beda (Ekspedisi, Astronot, Teknisi, atau PesawatAntariksa).
+2. Data awal tidak diisi lewat kode. Data awal sudah ada di database karena diisi lewat file `database/ekspedisi_antariksa.sql`, sehingga menu "Tampilkan Data" langsung berisi data tanpa harus input manual dulu.
+3. Setiap modul punya sub-menu (Tambah, Tampilkan, Ubah, Hapus, Kembali) yang memanggil method pada Controller terkait. Controller kemudian memanggil DAO untuk membaca atau menulis data ke database.
+4. Menu **"Ringkasan Semua Data"** memanggil class `Ringkasan`, yang mengambil data dari ketiga controller lain lewat method `getSemuaEntitas()` (data berasal dari database), menggabungkannya menjadi satu `List<EntitasAntariksa>`, lalu menampilkan identitas singkat setiap data secara seragam, walau tipe aslinya berbeda-beda (Ekspedisi, Astronot, Teknisi, atau PesawatAntariksa).
 5. Semua pembacaan input dari keyboard (`Scanner`) beserta validasinya dipusatkan di `View`, dipakai ulang oleh seluruh Controller.
-6. Program terus berputar dalam menu (`do-while`) sampai pengguna memilih "Keluar"/"Kembali".
+6. Program terus berputar dalam menu (`do-while`) sampai pengguna memilih "Keluar" atau "Kembali".
 
 ## Penerapan Encapsulation dan Inheritance
 
 ### Encapsulation
-Seluruh atribut pada `Ekspedisi`, `Kru` (beserta subclass-nya), dan `PesawatAntariksa` dideklarasikan `private`, dan hanya bisa diakses/diubah lewat getter dan setter publik. Contoh: `idKru`, `nama`, `usia` pada `Kru.java` bersifat `private`, hanya bisa dibaca lewat `getIdKru()`, `getNama()`, `getUsia()`, atau diubah lewat setter-nya.
+Seluruh atribut pada `Ekspedisi`, `Kru` (beserta subclass-nya), dan `PesawatAntariksa` dideklarasikan `private`, dan hanya bisa diakses atau diubah lewat getter dan setter publik. Contoh: `idKru`, `nama`, `usia` pada `Kru.java` bersifat `private`, hanya bisa dibaca lewat `getIdKru()`, `getNama()`, `getUsia()`, atau diubah lewat setter-nya.
 
 ### Inheritance
 Superclass abstrak `Kru` punya dua subclass:
 - `Astronot extends Kru` - menambahkan atribut `spesialisasi` dan `jamTerbang`.
 - `Teknisi extends Kru` - menambahkan atribut `bidangKeahlian` dan `sertifikasi`.
 
-Keduanya mewarisi atribut umum (`idKru`, `nama`, `usia`) beserta getter/setter dari `Kru`, dan memanggil constructor superclass lewat `super(...)`. `KruController` menyimpan data dalam satu `ArrayList<Kru>` berisi campuran objek `Astronot` dan `Teknisi`.
+Keduanya mewarisi atribut umum (`idKru`, `nama`, `usia`) beserta getter dan setter dari `Kru`, dan memanggil constructor superclass lewat `super(...)`. `KruController` bekerja dengan `List<Kru>` hasil DAO yang berisi campuran objek `Astronot` dan `Teknisi`.
 
 ## Penerapan Polymorphism dan Abstraction
 
@@ -45,13 +96,13 @@ Keduanya mewarisi atribut umum (`idKru`, `nama`, `usia`) beserta getter/setter d
 Kedua method ini tidak punya isi di `Kru`, dan **wajib** diimplementasikan oleh setiap subclass (`Astronot`, `Teknisi`) sesuai perannya masing-masing. Ini memaksa setiap jenis kru baru di masa depan untuk mendefinisikan perilakunya sendiri, sekaligus menyembunyikan detail implementasi di balik kontrak umum `Kru`.
 
 ### Polymorphism
-Diterapkan dalam dua bentuk, ditambah satu bentuk baru lewat interface:
+Diterapkan dalam tiga bentuk:
 
-1. **Method Overriding** (di dalam hierarki `Kru`) - `getPeran()` dan `getDetailTugas()` yang abstrak di `Kru` diimplementasikan berbeda oleh `Astronot` dan `Teknisi`. Saat `tampilkanData()` (didefinisikan sekali di `Kru`) dipanggil untuk objek apa pun dalam `ArrayList<Kru>`, hasilnya otomatis menyesuaikan tipe objek aslinya.
+1. **Method Overriding** (di dalam hierarki `Kru`) - `getPeran()` dan `getDetailTugas()` yang abstrak di `Kru` diimplementasikan berbeda oleh `Astronot` dan `Teknisi`. Saat `tampilkanData()` (didefinisikan sekali di `Kru`) dipanggil untuk objek apa pun dalam `List<Kru>`, hasilnya otomatis menyesuaikan tipe objek aslinya.
 2. **Method Overloading** - setiap Controller punya dua method pencarian dengan nama sama tapi parameter beda, misalnya `cariKru(int id)` vs `cariKru(String nama)`. Java memilih method yang sesuai berdasarkan tipe parameter saat dipanggil.
-3. **Polymorphism lewat Interface** (baru di Mini Project 3) - `RingkasanController` menyimpan data dalam `List<EntitasAntariksa>` berisi campuran `Ekspedisi`, `Astronot`, `Teknisi`, dan `PesawatAntariksa` -- empat class yang **tidak** berada dalam satu hierarki pewarisan yang sama. Saat method `getIdentitas()` dipanggil pada tiap elemen list, Java tetap menjalankan implementasi sesuai tipe objek aslinya. Ini membuktikan polymorphism tidak hanya berlaku lewat inheritance (subclass-superclass), tapi juga lewat interface (unrelated classes).
+3. **Polymorphism lewat Interface** - class `Ringkasan` menyimpan data dalam `List<EntitasAntariksa>` berisi campuran `Ekspedisi`, `Astronot`, `Teknisi`, dan `PesawatAntariksa`, yaitu empat class yang **tidak** berada dalam satu hierarki pewarisan yang sama. Saat method `getIdentitas()` dipanggil pada tiap elemen list, Java tetap menjalankan implementasi sesuai tipe objek aslinya. Ini membuktikan polymorphism tidak hanya berlaku lewat inheritance (subclass-superclass), tapi juga lewat interface (unrelated classes).
 
-## Penerapan Nilai Tambah: Interface
+## Penerapan Interface
 
 <img width="332" height="109" alt="image" src="https://github.com/user-attachments/assets/ba487b7b-d9c4-4cae-b977-9496b08ae79f" />
 
@@ -60,9 +111,132 @@ Diimplementasikan oleh **tiga class yang berbeda hierarki**:
 - `Kru implements EntitasAntariksa` (lalu otomatis diwarisi `Astronot` dan `Teknisi`)
 - `PesawatAntariksa implements EntitasAntariksa`
 
-Interface ini dipakai secara konkret di `controller/RingkasanController.java`: method `tampilkanRingkasanSemua()` mengambil data dari ketiga controller lain lewat method `getSemuaEntitas()` (yang masing-masing mengembalikan `List<EntitasAntariksa>`), menggabungkannya jadi satu list, lalu mencetak `getIdentitas()` tiap elemen. Fitur ini bisa diakses lewat menu utama **"4. Ringkasan Semua Data"**.
+Interface ini dipakai secara konkret di `controller/Ringkasan.java`: method `tampilkanRingkasanSemua()` mengambil data dari ketiga controller lain lewat method `getSemuaEntitas()` (yang masing-masing mengembalikan `List<EntitasAntariksa>`), menggabungkannya jadi satu list, lalu mencetak `getIdentitas()` tiap elemen. Fitur ini bisa diakses lewat menu utama **"4. Ringkasan Semua Data"**.
 
-Manfaat nyatanya: `RingkasanController` tidak perlu tahu atau peduli apakah suatu data itu `Ekspedisi`, `Astronot`, `Teknisi`, atau `PesawatAntariksa` -- selama class itu `implements EntitasAntariksa`, ia bisa diperlakukan secara seragam.
+Manfaat nyatanya: `Ringkasan` tidak perlu tahu atau peduli apakah suatu data itu `Ekspedisi`, `Astronot`, `Teknisi`, atau `PesawatAntariksa`. Selama class itu `implements EntitasAntariksa`, ia bisa diperlakukan secara seragam.
+
+## Koneksi Database dengan JDBC
+
+Class `config/Koneksi.java` menyimpan alamat database, username, dan password, lalu menyediakan method `getConnection()` yang mengembalikan objek `Connection`. Jika koneksi belum ada atau sudah tertutup, koneksi baru dibuat.
+
+```java
+private static final String URL = "jdbc:mysql://localhost:3306/ekspedisi_antariksa";
+private static final String USER = "root";
+private static final String PASS = "";
+```
+
+Driver yang dipakai adalah `mysql-connector-j`, ditambahkan sebagai dependency di `pom.xml`. Class `TesKoneksi` dipakai untuk menguji bahwa program berhasil terhubung ke database.
+
+## DAO dan Prepared Statement
+
+Setiap entitas punya satu class DAO (`EkspedisiDAOCC`, `KruDAOCC`, `PesawatDAOCC`) yang berisi operasi CRUD. Semua query memakai **`PreparedStatement`**: nilai dimasukkan lewat tanda tanya (`?`), bukan digabung langsung ke teks SQL.
+
+```java
+String sql = "INSERT INTO ekspedisi (id_ekspedisi, nama, tujuan, durasi, status) VALUES (?, ?, ?, ?, ?)";
+try (PreparedStatement ps = Koneksi.getConnection().prepareStatement(sql)) {
+    ps.setInt(1, e.getIdEkspedisi());
+    ps.setString(2, e.getNamaEkspedisi());
+    ps.setString(3, e.getTujuan());
+    ps.setInt(4, e.getDurasi());
+    ps.setString(5, e.getStatus());
+    return ps.executeUpdate() > 0;
+}
+```
+
+Manfaat `PreparedStatement`:
+- Mencegah **SQL injection**, karena input pengguna diperlakukan sebagai nilai, bukan bagian dari perintah SQL.
+- Query lebih rapi dan mudah dibaca.
+- Tipe data tiap parameter jelas (`setInt`, `setString`).
+
+Method yang tersedia di setiap DAO:
+
+| Method | Fungsi |
+|---|---|
+| `tambah()` | Menyimpan data baru (`INSERT`) |
+| `getAll()` | Mengambil semua data (`SELECT`) |
+| `getById()` | Mengambil satu data berdasarkan ID |
+| `cariByNama()` | Mencari data berdasarkan nama (`LIKE`) |
+| `ubah()` | Memperbarui data (`UPDATE`) |
+| `hapus()` | Menghapus data (`DELETE`) |
+| `idSudahAda()` | Mengecek ID duplikat sebelum menambah data |
+
+Pada `KruDAOCC`, hierarki pewarisan dipetakan ke satu tabel `kru` dengan kolom `tipe` (`Astronot` atau `Teknisi`). Saat menyimpan, `instanceof` menentukan kolom khusus mana yang diisi. Saat membaca, kolom `tipe` menentukan objek yang dibuat: `Astronot` atau `Teknisi`.
+
+## Database dan Data Awal dari File `.sql`
+
+File `database/ekspedisi_antariksa.sql` berisi perintah untuk membuat database, tiga tabel (`ekspedisi`, `kru`, `pesawat_antariksa`), dan mengisi data awal dengan `INSERT`. Data awal **tidak** ditulis di dalam kode Java, sehingga menu "Tampilkan Data" langsung berisi data begitu program dijalankan.
+
+Cara memakai file `.sql`:
+1. Jalankan MySQL (XAMPP atau Laragon).
+2. Import file lewat phpMyAdmin (tab **Import**), atau lewat terminal:
+   ```
+   mysql -u root -p < database/ekspedisi_antariksa.sql
+   ```
+3. Pastikan database `ekspedisi_antariksa` beserta tiga tabelnya muncul.
+
+File `.sql` memuat `DROP TABLE IF EXISTS`, sehingga aman di-import ulang untuk mengembalikan data ke kondisi awal.
+
+## Nilai Tambah: ORM (Hibernate)
+
+**ORM** (*Object Relational Mapping*) memetakan class Java ke tabel database, sehingga kita bekerja dengan objek dan Hibernate yang membuat SQL-nya secara otomatis.
+
+### Pemetaan Class ke Tabel
+
+Class model diberi anotasi JPA sehingga menjadi *entity*:
+
+```java
+@Entity
+@Table(name = "ekspedisi")
+public class Ekspedisi implements EntitasAntariksa {
+    @Id
+    @Column(name = "id_ekspedisi")
+    private int idEkspedisi;
+
+    @Column(name = "nama")
+    private String namaEkspedisi;
+    ...
+}
+```
+
+Hierarki `Kru`, `Astronot`, dan `Teknisi` dipetakan dengan strategi **single table**: satu tabel `kru`, dibedakan oleh kolom `tipe`.
+
+```java
+@Entity
+@Table(name = "kru")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipe", discriminatorType = DiscriminatorType.STRING)
+public abstract class Kru implements EntitasAntariksa { ... }
+
+@Entity
+@DiscriminatorValue("Astronot")
+public class Astronot extends Kru { ... }
+```
+
+Karena itu, saat data kru dibaca, Hibernate langsung membuat objek `Astronot` atau `Teknisi` sesuai nilai kolom `tipe`, tanpa `instanceof` maupun `setNull` manual seperti pada JDBC.
+
+### HibernateUtil dan DAO ORM
+
+`HibernateUtil` membangun `SessionFactory` (konfigurasi koneksi dan daftar entity) satu kali saja. Class `EkspedisiDAOORM`, `KruDAOORM`, dan `PesawatDAOORM` memakai `SessionFactory` tersebut untuk operasi CRUD:
+
+```java
+sf.inTransaction(session -> session.persist(e));   // tambah
+session.find(Ekspedisi.class, id);                 // cari berdasarkan ID
+session.createSelectionQuery("from Ekspedisi order by idEkspedisi", Ekspedisi.class)
+       .getResultList();                           // tampilkan semua
+```
+
+Hibernate tidak dibiarkan mengubah struktur tabel (`hbm2ddl` tidak diaktifkan), karena tabel dan data awal dibuat lewat file `.sql`.
+
+### Perbandingan JDBC dan ORM
+
+| | DAO JDBC (`DAOCC`) | DAO ORM (`DAOORM`) |
+|---|---|---|
+| SQL | Ditulis manual | Dibuat otomatis oleh Hibernate |
+| Mengubah data tabel menjadi objek | Manual (`ResultSet` dan `mapRow`) | Otomatis lewat anotasi |
+| Astronot dan Teknisi | `instanceof` dan `setNull` | `@DiscriminatorValue` |
+| Jumlah kode | Lebih panjang | Lebih ringkas |
+
+Kedua jenis DAO tetap disimpan di package `dao`. Controller memakai DAO ORM; untuk kembali ke JDBC cukup mengganti import dan satu baris deklarasi field di Controller. Konfigurasi `hibernate.show_sql` diaktifkan agar SQL hasil buatan Hibernate tampil di konsol (baris berawalan `Hibernate:`) sebagai bukti ORM berjalan.
 
 ## Validasi Input yang Diterapkan
 
@@ -70,21 +244,34 @@ Manfaat nyatanya: `RingkasanController` tidak perlu tahu atau peduli apakah suat
 - Input angka tertentu wajib lebih dari 0, misalnya ID, durasi, kapasitas, usia (`inputIntPositif`).
 - Input angka tertentu tidak boleh negatif, misalnya jam terbang (`inputIntNonNegatif`).
 - Input teks wajib diisi, tidak boleh kosong (`inputString`).
-- ID pada setiap entitas divalidasi agar tidak duplikat sebelum data baru ditambahkan.
+- ID pada setiap entitas divalidasi agar tidak duplikat sebelum data baru ditambahkan, dengan mengecek ke database lewat method `idSudahAda()` pada DAO.
 - Pilihan menu dan pilihan status divalidasi terhadap rentang pilihan yang tersedia.
 
-## Dummy Data Awal
+## Dummy Data Awal (dari file `.sql`)
 
-- **Ekspedisi**: "Galang Dana BEM KM UNMUL" (tujuan Mars, status Berlangsung).
+Data awal diisi lewat `database/ekspedisi_antariksa.sql`, bukan lewat kode:
+
+- **Ekspedisi**: "Galang Dana BEM KM UNMUL" (tujuan Mars, 14 hari, status Berlangsung) dan "Misi Bulan Nusantara" (tujuan Bulan, 30 hari, status Direncanakan).
 - **Kru**: 1 data Astronot ("Dylan Al Furqon") dan 1 data Teknisi ("Tony Stark").
-- **Pesawat Antariksa**: "Taufan BAEK" (jenis Roket Orbital, status Siap).
+- **Pesawat Antariksa**: "Taufan BAEK" (Roket Orbital, status Siap) dan "Nusantara-2" (Shuttle, status Perawatan).
+
+## Cara Menjalankan Program
+
+1. Pasang **JDK** dan **Maven** (atau gunakan NetBeans).
+2. Jalankan **MySQL** dan import `database/ekspedisi_antariksa.sql`.
+3. Sesuaikan username dan password MySQL di `config/Koneksi.java` dan `config/HibernateUtil.java`.
+4. **Clean and Build** project (Maven akan mengunduh dependency `mysql-connector-j` dan `hibernate-core`).
+5. Jalankan `main/Main.java`.
 
 ## Dokumentasi Output
+
+### Alur Menu Program
+
 <img width="279" height="170" alt="image" src="https://github.com/user-attachments/assets/39c57942-c593-4c44-ab49-98235a0a628d" /> <br>
 Tampilan `menu utama` berisi 4 modul `Ekspedisi, Kru, Pesawat, Ringkasan Semua Data` dan pilihan `Keluar`. Program berjalan dalam `loop` sampai pengguna memilih `keluar`. <br>
 
 <img width="277" height="176" alt="image" src="https://github.com/user-attachments/assets/2fd1e529-1604-4189-ab5b-3f5c9d45ed4f" /> <br>
-Menampilkan dummy data awal ("Galang Dana BEM KM UNMUL", tujuan Mars, status Berlangsung) yang diisi otomatis oleh `EkspedisiController`. <br>
+Menampilkan data awal `ekspedisi` yang dibaca dari database (hasil import file `.sql`) oleh `EkspedisiController`. <br>
 
 <img width="269" height="276" alt="image" src="https://github.com/user-attachments/assets/c3163282-897b-47da-a4de-43a0dbb9b77d" /> <br>
 Input data `ekspedisi` baru (ID, nama, tujuan, durasi, status). ID divalidasi agar tidak duplikat. <br>
@@ -105,11 +292,11 @@ Tampilan di atas adalah antarmuka menu berbasis teks untuk fitur pengelolaan dat
 Tampilan di atas menunjukkan proses interaktif saat pengguna menambahkan data `kru` baru ke dalam sistem. Program meminta input secara bertahap mulai dari informasi umum hingga atribut khusus berdasarkan peran `kru` tersebut. <br>
 
 <img width="525" height="347" alt="image" src="https://github.com/user-attachments/assets/539c869e-ba34-49ea-b4f6-829f1197a1a6" /> <br>
-Tampilan di atas menunjukkan daftar seluruh data `kru` yang telah berhasil disimpan dan terdaftar di dalam sistem. Program menampilkan informasi secara terstruktur dengan garis pemisah yang jelas untuk setiap data `kru`. <br> 
+Tampilan di atas menunjukkan daftar seluruh data `kru` yang telah berhasil disimpan dan terdaftar di dalam sistem. Program menampilkan informasi secara terstruktur dengan garis pemisah yang jelas untuk setiap data `kru`. <br>
 
 <img width="276" height="156" alt="image" src="https://github.com/user-attachments/assets/b2f43bfb-20d3-4b15-9a47-eefcda796d81" /> 
 <img width="523" height="347" alt="image" src="https://github.com/user-attachments/assets/ec704846-0cd0-45c0-bed9-81d7e81f15c9" /> <br>
-Tampilan di atas menunjukkan proses interaktif saat pengguna memperbarui atau mengedit informasi data `kru` yang sudah tersimpan di dalam sistem. Gambar Sebelahnya menunjukkan daftar seluruh data `kru` setelah proses perubahan data (Update) berhasil dilakukan pada ID tertentu. <br>
+Tampilan di atas menunjukkan proses interaktif saat pengguna memperbarui atau mengedit informasi data `kru` yang sudah tersimpan di dalam sistem. Gambar sebelahnya menunjukkan daftar seluruh data `kru` setelah proses perubahan data (Update) berhasil dilakukan pada ID tertentu. <br>
 
 <img width="287" height="80" alt="image" src="https://github.com/user-attachments/assets/06621d8b-c309-49bd-9e2a-b58e43dafac3" /> 
 <img width="535" height="244" alt="image" src="https://github.com/user-attachments/assets/833766d2-0236-4d3b-8061-80312f82bbd4" /> <br>
@@ -135,14 +322,21 @@ Tampilan di atas menunjukkan menu rekapitulasi atau `ringkasan` keseluruhan data
 <img width="575" height="320" alt="image" src="https://github.com/user-attachments/assets/d8537d30-1695-4d52-9cbb-cc9eefae9ee8" /> <br>
 Tampilan di atas merupakan menu utama dari `Sistem Pengelolaan Ekspedisi Antariksa` beserta proses penutupan program. <br>
 
+### Dokumentasi Database, JDBC, dan ORM
 
+> Ganti `GANTI_DENGAN_LINK_GAMBAR` pada setiap gambar di bawah dengan link screenshot milikmu.
 
+<img width="500" alt="phpMyAdmin" src="GANTI_DENGAN_LINK_GAMBAR" /> <br>
+Tampilan tabel `ekspedisi`, `kru`, dan `pesawat_antariksa` di phpMyAdmin beserta data awal hasil import file `.sql`. <br>
 
-<img width="283" height="140" alt="image" src="https://github.com/user-attachments/assets/4fa8f369-97a0-4b7e-99c3-72399bad7973" />
-<img width="309" height="199" alt="image" src="https://github.com/user-attachments/assets/dddb5daf-eef1-4430-b3aa-c97b4832815c" />
-<img width="277" height="154" alt="image" src="https://github.com/user-attachments/assets/93dadd64-ca83-4f30-bc39-f0198c7eec75" />
-<img width="429" height="63" alt="image" src="https://github.com/user-attachments/assets/c205e84a-d8cd-4057-afbc-e6cbfe5d4faf" />
-<img width="608" height="73" alt="image" src="https://github.com/user-attachments/assets/1a533493-a6a8-4dba-be75-cb4b9c414f09" />
-<img width="350" height="63" alt="image" src="https://github.com/user-attachments/assets/5d2c7a13-4af6-433c-b5d9-3e4537a50e69" />
-<img width="486" height="663" alt="image" src="https://github.com/user-attachments/assets/cf1926db-0a5f-471b-9dd8-dad8c083a872" />
+<img width="500" alt="Tes Koneksi" src="GANTI_DENGAN_LINK_GAMBAR" /> <br>
+Hasil uji koneksi: pesan `Koneksi Berhasil` menandakan program sudah terhubung ke database `ekspedisi_antariksa` lewat JDBC. <br>
 
+<img width="500" alt="Tampilkan data dengan ORM" src="GANTI_DENGAN_LINK_GAMBAR" /> <br>
+Menu "Tampilkan Data" langsung berisi data tanpa input manual, karena data dibaca dari database. Baris berawalan `Hibernate: select ...` di atasnya adalah SQL yang dibuat otomatis oleh ORM (Hibernate). <br>
+
+<img width="500" alt="Isi tabel setelah CRUD" src="GANTI_DENGAN_LINK_GAMBAR" /> <br>
+Isi tabel di phpMyAdmin setelah proses tambah, ubah, dan hapus, membuktikan perubahan benar-benar tersimpan di database. <br>
+
+<img width="500" alt="Data permanen" src="GANTI_DENGAN_LINK_GAMBAR" /> <br>
+Data yang ditambahkan tetap ada setelah program ditutup dan dijalankan ulang, membuktikan data tersimpan permanen di database. <br>
