@@ -236,13 +236,18 @@ Tampilan di atas merupakan menu utama dari `Sistem Pengelolaan Ekspedisi Antarik
 <img width="712" height="98" alt="image" src="https://github.com/user-attachments/assets/bf988fc3-b27e-40e3-a280-7131619a5191" /> 
 <img width="987" height="101" alt="image" src="https://github.com/user-attachments/assets/dbe0e2d7-be8b-4fc5-986d-eedb3902bbad" />
 <img width="623" height="95" alt="image" src="https://github.com/user-attachments/assets/cd65063e-626e-4d01-9a2a-9a65c2bc58b5" /> <br>
+Tampilan di atas adalah database `ekspedisi_antariksa` di phpMyAdmin setelah file `ekspedisi_antariksa.sql` berhasil di-import. Database berisi tiga tabel berengine InnoDB, masing-masing sudah terisi 2 baris data awal tanpa diinput lewat program:
 
-Tampilan tabel `ekspedisi`, `kru`, dan `pesawat_antariksa` di phpMyAdmin beserta data awal hasil import file `.sql`. <br>
+- Tabel `ekspedisi` berisi 2 data: "Galang Dana BEM KM UNMUL" (tujuan Mars, 14 hari, status Berlangsung) dan "Misi Bulan Nusantara" (tujuan Bulan, 30 hari, status Direncanakan).
+- Tabel `kru` berisi 2 data: Dylan Al Furqon bertipe `Astronot` (spesialisasi Pengendali Multiverse, jam terbang 500) dan Tony Stark bertipe `Teknisi` (bidang keahlian Genius, Billionaire, Playboy, sertifikasi ISO 9001). Kedua peran disimpan dalam satu tabel dan dibedakan oleh kolom `tipe`, sehingga kolom khusus Astronot (`spesialisasi`, `jam_terbang`) bernilai `NULL` pada baris Teknisi, begitu juga sebaliknya.
+- Tabel `pesawat_antariksa` berisi 2 data: "Taufan BAEK" (Roket Orbital, kapasitas 6, status Siap) dan "Nusantara-2" (Shuttle, kapasitas 4, status Perawatan).
+
+Data inilah yang langsung tampil saat menu "Tampilkan Data" dijalankan, membuktikan data awal berasal dari database, bukan dari kode program. <br>
 
 <img width="885" height="388" alt="image" src="https://github.com/user-attachments/assets/49d39489-ad6c-4293-9797-b9d8c871e30d" /> <br>
 Hasil uji koneksi: pesan `Koneksi Berhasil` menandakan program sudah terhubung ke database `ekspedisi_antariksa` lewat JDBC. <br>
 
-<img width="500" alt="Tampilkan data dengan ORM" src="GANTI_DENGAN_LINK_GAMBAR" /> <br>
+<img width="1181" height="260" alt="image" src="https://github.com/user-attachments/assets/e3d3e370-c50c-467c-8b63-6e415fd3dc02" /> <br>
 Menu "Tampilkan Data" langsung berisi data tanpa input manual, karena data dibaca dari database. Baris berawalan `Hibernate: select ...` di atasnya adalah SQL yang dibuat otomatis oleh ORM (Hibernate). <br>
 
 <img width="911" height="257" alt="image" src="https://github.com/user-attachments/assets/bae11e47-7fa4-463f-bb23-17baa656167e" /> <br>
